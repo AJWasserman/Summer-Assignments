@@ -2,7 +2,7 @@
 Collection of summer programming assignments for FRC Team 706
 
 
-Assignments: 
+Assignments:   
 	1. Hex Game of Life  
 	2. Removem  		
 	3. Scientific Calculator  			
