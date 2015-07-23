@@ -26,6 +26,8 @@ void setup() {
     }
   }
   placeBombs(); 
+  neighborBombs();
+  print(neighbors[4][4]);
 }
 
 void draw() {
@@ -33,6 +35,7 @@ void draw() {
     
   if(inGame) {
     frame.setResizable(true);
+    fill(200, 200, 200);
     rect(0, 0, width, 40);
     genVariables(); //generates hexagon variables
     drawBoard();  
@@ -82,65 +85,59 @@ void placeBombs() {
     }
     print("(" + randX + " " + randY + ") ");
   }
-  print("Place Count: " + placeCount);
+  print("Place Count: " + placeCount + " ");
 }
 
 void neighborBombs() {
-  int bombNeighbors = 0;
   for (int x = 0; x < boardWidth; x++) {
     for (int y = 0; y < boardHeight; y++) {
       try {
         //Checks bordering hexagons for even columns
         if (x % 2 == 0) {
           if (this.hasBomb[x][y - 1]) {
-            bombNeighbors++;
+            neighbors[x][y] += 1;
           }
-          if (this.hasBomb[x+1][y]) {
-            bombNeighbors++;
+          if (this.hasBomb[x - 1][y - 1]) {
+            neighbors[x][y] += 1;
           }
           
-          if (this.hasBomb[x+1][y + 1]) {
-            bombNeighbors++;
+          if (this.hasBomb[x - 1][y]) {
+            neighbors[x][y] += 1;
+          }
+          if (this.hasBomb[x + 1][y - 1]) {
+            neighbors[x][y] += 1;
+          }
+          if (this.hasBomb[x + 1][y]) {
+            neighbors[x][y] += 1;
           }
           if (this.hasBomb[x][y + 1]) {
-            bombNeighbors++;
-          }
-          if (this.hasBomb[x - 1][y + 1]) {
-            bombNeighbors++;
-          }
-          if (this.hasBomb[x - 1][y]) {
-            bombNeighbors++;
+            neighbors[x][y] += 1;
           }
         }
         //Checks bordering hexagons for odd columns
         else {
-          if (this.hasBomb[x][y-1]) {
-            bombNeighbors++;
+          if (this.hasBomb[x][y - 1]) {
+            neighbors[x][y] += 1;
           }
-          if (this.hasBomb[x + 1][y - 1]) {
-            bombNeighbors++;
+          if (this.hasBomb[x-1][y]) {
+            neighbors[x][y] += 1;
           }
-          if (this.hasBomb[x][y]) {
-            bombNeighbors++;
+          
+          if (this.hasBomb[x+1][y]) {
+            neighbors[x][y] += 1;
           }
-          if (this.hasBomb[x + 1][y]) {
-            bombNeighbors++;
+          if (this.hasBomb[x - 1][y + 1]) {
+            neighbors[x][y] += 1;
           }
           if (this.hasBomb[x][y + 1]) {
-            bombNeighbors++;
+            neighbors[x][y] += 1;
           }
-          if (this.hasBomb[x - 1][y]) {
-            bombNeighbors++;
-          }
-          if (this.hasBomb[x - 1][y - 1]) {
-            bombNeighbors++;
+          if (this.hasBomb[x + 1][y + 1]) {
+            neighbors[x][y] += 1;
           }
         }
       }
-      catch (Exception e) {
-        System.out.println(e.toString());
-      }
-      neighbors[x][y] = bombNeighbors;
+      catch (Exception e) {}
     }
   }
 }
