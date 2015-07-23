@@ -4,8 +4,7 @@ int bombCount = 10;
 
 boolean[][] hasBomb = new boolean[boardWidth][boardHeight];
 int[][] neighbors = new int[boardWidth][boardHeight];
-
-boolean hasGen = false;
+boolean[][] placed = new boolean[boardWidth][boardHeight];
 
 //Hexagon Variables
 float s; // = 700/(2*boardWidth); //Side length
@@ -21,22 +20,17 @@ boolean gameOver = false;
 void setup() {
   size(700, 700);
   frame.setTitle("Hexagonal Minesweeper");
-
+  for(int x = 0; x < boardWidth; x++) { 
+    for(int y = 0; y < boardHeight; y++) {
+      placed[x][y] = false;
+    }
+  }
+  placeBombs(); 
 }
 
 void draw() {
   background(102);
-  
-  if(!hasGen) {
-    placeBombs(); 
     
-    for(int x = 0; x < boardWidth; x++) { 
-      for(int y = 0; y < boardHeight; y++) {
-        print(hasBomb[x][y] + " ");
-      }
-    }
-  }
-      
   if(inGame) {
     frame.setResizable(true);
     rect(0, 0, width, 40);
@@ -73,16 +67,22 @@ void drawBoard() {
   }
 }
 
-void placeBombs() {
-  int amount = bombCount;
-  
-  for(int i = 0; i < amount; i++) {
-    int randX = floor(random(boardWidth));
-    int randY = floor(random(boardWidth));
-          
-    hasBomb[randX][randY] = true;
+void placeBombs() {  
+  int placeCount = bombCount;
+  for(int i = 0; i < placeCount; i++) {
+    int randX = (int)random(boardWidth);
+    int randY = (int)random(boardHeight);
+    if(placed[randX][randY]) {
+      print("dupe ");
+      placeCount++;
+    }
+    else {
+      hasBomb[randX][randY] = true;
+      placed[randX][randY] = true;
+    }
+    print("(" + randX + " " + randY + ") ");
   }
-  hasGen = true;
+  print("Place Count: " + placeCount);
 }
 
 void neighborBombs() {
