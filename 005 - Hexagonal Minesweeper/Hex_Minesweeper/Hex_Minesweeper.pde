@@ -3,19 +3,23 @@ int boardHeight = 9;
 int bombCount = 10;
 
 boolean[][] hasBomb = new boolean[boardWidth][boardHeight];
+boolean[][] flagged = new boolean[boardWidth][boardHeight];
 int[][] neighbors = new int[boardWidth][boardHeight];
 boolean[][] placed = new boolean[boardWidth][boardHeight];
+boolean[][] hover = new boolean[boardWidth][boardHeight];
 
 //Hexagon Variables
 float s; // = 700/(2*boardWidth); //Side length
 float w; // = 2*s; //Width
 float h; // = sqrt(3)/2*w; //Height 
+float r;
 float offset; //Variable for offsetting odd rows
 int border; 
 
 boolean drawMenu = true;
 boolean inGame = true;
 boolean gameOver = false;
+boolean hasGen = false;
 
 void setup() {
   size(700, 700);
@@ -25,19 +29,22 @@ void setup() {
       placed[x][y] = false;
     }
   }
-  placeBombs(); 
-  neighborBombs();
-  print(neighbors[4][4]);
 }
 
 void draw() {
   background(102);
-    
   if(inGame) {
     frame.setResizable(true);
+    genVariables(); //generates hexagon variables
+    
+    hoverHex();
+    
+    if(!hasGen) {
+      placeBombs(); 
+      neighborBombs();
+    }
     fill(200, 200, 200);
     rect(0, 0, width, 40);
-    genVariables(); //generates hexagon variables
     drawBoard();  
     frame.setSize((int)((boardWidth*1.55*s + (w / 2))), (int)(50 + 2 * border + offset + (sqrt(3)/2) * w * boardHeight));
   }
@@ -86,6 +93,7 @@ void placeBombs() {
     print("(" + randX + " " + randY + ") ");
   }
   print("Place Count: " + placeCount + " ");
+  hasGen = true;
 }
 
 void neighborBombs() {
@@ -146,6 +154,7 @@ void genVariables() {
   s = maxSize();
   w = 2*s; //Width
   h = sqrt(3)/2*w; //Height 
+  r = (3/2) * s;
   border = (int) w /2; //Gives room between grid and window edges
 }
 
@@ -170,3 +179,51 @@ void hexagon(float x, float y) {
    vertex(x+s/2, y-(sqrt(3)/2*w)/2); 
    endShape(CLOSE);
 }
+
+void mousePressed() {
+  for(int x = 0; x < boardWidth; x ++) {
+    for(int y = 0; y < boardHeight; y++) {
+      if(hover[x][y]) {
+        if(mouseButton == LEFT) {
+          print("Clicked: " + x + ", " + y + " ");
+        }
+        else if(mouseButton == RIGHT) {
+          print("Flagged: " + x + ", " + y + " ");
+          flag(x, y);
+        }
+      }
+    }
+  }
+}
+
+void hoverHex() {
+  for(int x = 0; x < boardWidth; x ++) {
+    for(int y = 0; y < boardHeight; y++) {
+      if((x%2) != 0) { 
+        offset = h/2; //Offsets row y position on odd rows
+      }
+      else {
+        offset = 0; //No offset on even rows
+      }
+      float hexX = border + x*.75*w;
+      float hexY = 40 + border + offset + y*sqrt(3)/2*w;
+      float disX = hexX - mouseX;
+      float disY = hexY - mouseY;
+      if (sqrt(sq(disX) + sq(disY)) < (s*(sqrt(3)/2))) {
+        hover[x][y] = true;
+      } else {
+        hover[x][y] = false;
+      }   
+    }
+  }
+}
+
+void flag(int x, int y) {
+  if(flagged[x][y]) {
+    flagged[x][y] = false;  
+  }
+  else {
+    flagged[x][y] = true;  
+  }
+}
+
