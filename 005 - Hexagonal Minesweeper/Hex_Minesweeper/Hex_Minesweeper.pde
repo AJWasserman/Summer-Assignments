@@ -12,14 +12,10 @@ boolean[][] hover = new boolean[boardWidth][boardHeight];
 float s; // = 700/(2*boardWidth); //Side length
 float w; // = 2*s; //Width
 float h; // = sqrt(3)/2*w; //Height 
-float r;
-float offset; //Variable for offsetting odd rows
+float offset; 
 int border; 
 
-boolean drawMenu = true;
 boolean inGame = true;
-boolean gameOver = false;
-boolean hasGen = false;
 
 void setup() {
   size(700, 700);
@@ -29,29 +25,23 @@ void setup() {
       placed[x][y] = false;
     }
   }
+  placeBombs(); 
+  neighborBombs();
 }
 
 void draw() {
   background(102);
   if(inGame) {
     frame.setResizable(true);
-    genVariables(); //generates hexagon variables
+    genVariables(); 
     
     hoverHex();
     
-    if(!hasGen) {
-      placeBombs(); 
-      neighborBombs();
-    }
     fill(200, 200, 200);
     rect(0, 0, width, 40);
     drawBoard();  
     frame.setSize((int)((boardWidth*1.55*s + (w / 2))), (int)(50 + 2 * border + offset + (sqrt(3)/2) * w * boardHeight));
   }
-}
-
-void drawMenu() {
-
 }
 
 void drawBoard() {
@@ -68,8 +58,11 @@ void drawBoard() {
       if(hasBomb[x][y] == true) {
         fill(255, 0, 0);  
       }
+      else if(neighbors[x][y] != 0) {
+        fill(0, 0, 255);  
+      }
       else {
-        fill(255, 255, 255);  
+        fill(255, 255, 255);
       }
       hexagon(border + x*.75*w, 40 + border + offset + y*sqrt(3)/2*w);
       popMatrix();   
@@ -93,57 +86,33 @@ void placeBombs() {
     print("(" + randX + " " + randY + ") ");
   }
   print("Place Count: " + placeCount + " ");
-  hasGen = true;
 }
 
 void neighborBombs() {
-  for (int x = 0; x < boardWidth; x++) {
-    for (int y = 0; y < boardHeight; y++) {
+  int bc = bombCount;
+  int bw = boardWidth;
+  int bh = boardHeight;
+  for (int x = 0; x < bw; x++) {
+    for (int y = 0; y < bh; y++) {
       try {
-        //Checks bordering hexagons for even columns
-        if (x % 2 == 0) {
-          if (this.hasBomb[x][y - 1]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x - 1][y - 1]) {
-            neighbors[x][y] += 1;
-          }
-          
-          if (this.hasBomb[x - 1][y]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x + 1][y - 1]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x + 1][y]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x][y + 1]) {
-            neighbors[x][y] += 1;
-          }
+        if ((x%2) == 0 && hasBomb[x][y]) {
+          neighbors[x][y-1] += 1; 
+          neighbors[x][y+1] += 1; 
+          neighbors[x+1][y-1] += 1; 
+          neighbors[x+1][y] += 1; 
+          neighbors[x-1][y-1] += 1; 
+          neighbors[x-1][y] += 1;    
         }
         //Checks bordering hexagons for odd columns
-        else {
-          if (this.hasBomb[x][y - 1]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x-1][y]) {
-            neighbors[x][y] += 1;
-          }
-          
-          if (this.hasBomb[x+1][y]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x - 1][y + 1]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x][y + 1]) {
-            neighbors[x][y] += 1;
-          }
-          if (this.hasBomb[x + 1][y + 1]) {
-            neighbors[x][y] += 1;
-          }
+        else if ((x%2) != 0 && hasBomb[x][y]) {
+          neighbors[x][y-1] += 1; 
+          neighbors[x][y+1] += 1; 
+          neighbors[x-1][y] += 1; 
+          neighbors[x+1][y] += 1; 
+          neighbors[x-1][y+1] += 1; 
+          neighbors[x+1][y+1] += 1; 
         }
+        else {}
       }
       catch (Exception e) {}
     }
@@ -151,11 +120,10 @@ void neighborBombs() {
 }
 
 void genVariables() {
-  s = maxSize();
+  s = maxSize(); //Side length
   w = 2*s; //Width
   h = sqrt(3)/2*w; //Height 
-  r = (3/2) * s;
-  border = (int) w /2; //Gives room between grid and window edges
+  border = (int) w /2; 
 }
 
 float maxSize() {
@@ -186,6 +154,7 @@ void mousePressed() {
       if(hover[x][y]) {
         if(mouseButton == LEFT) {
           print("Clicked: " + x + ", " + y + " ");
+          print("neighbors: " + neighbors[x][y] + " ");
         }
         else if(mouseButton == RIGHT) {
           print("Flagged: " + x + ", " + y + " ");
