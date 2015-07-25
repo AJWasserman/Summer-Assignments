@@ -1,10 +1,12 @@
 int boardWidth = 9;
 int boardHeight = 9;
 int bombCount = 10;
+int flagCount = bombCount;
 
 boolean[][] hasBomb = new boolean[boardWidth][boardHeight];
 boolean[][] flagged = new boolean[boardWidth][boardHeight];
 int[][] neighbors = new int[boardWidth][boardHeight];
+boolean[][] covered = new boolean[boardWidth][boardHeight];
 boolean[][] placed = new boolean[boardWidth][boardHeight];
 boolean[][] hover = new boolean[boardWidth][boardHeight];
 boolean[][] unN = new boolean[boardWidth][boardHeight];
@@ -16,7 +18,9 @@ float h; // = sqrt(3)/2*w; //Height
 float offset; 
 int border; 
 
+boolean menu = false;
 boolean inGame = true;
+boolean gameOver = false;
 
 
 void setup() {
@@ -26,6 +30,7 @@ void setup() {
     for(int y = 0; y < boardHeight; y++) {
       placed[x][y] = false;
       unN[x][y] = true;
+      covered[x][y] = true;
     }
   }
   placeBombs(); 
@@ -62,7 +67,13 @@ void drawBoard() {
       }
         
       pushMatrix();
-      if(hasBomb[x][y] == true) {
+      if(flagged[x][y]) {
+        fill(255, 255, 0);  
+      }
+      else if(covered[x][y] == true) {
+        fill(0, 255, 0);  
+      }
+      else if(hasBomb[x][y] == true) {
         fill(255, 0, 0);  
       }
       else if(neighbors[x][y] != 0) {
@@ -187,10 +198,24 @@ void mousePressed() {
       if(hover[x][y]) {
         if(mouseButton == LEFT) {
           print("Clicked: " + x + ", " + y + " ");
-          print("neighbors: " + neighbors[x][y] + " ");
+          if(covered[x][y]) {
+            if(!flagged[x][y]) {
+              if(neighbors[x][y] == 0 && !hasBomb[x][y]) {
+                clearField(x, y);  
+                covered[x][y] = false;
+              }
+              else {
+                covered[x][y] = false;  
+              }
+            }
+            if(hasBomb[x][y]) {
+              print("Game over ");
+              //gameOver();
+            }
+          }
+          //print("neighbors: " + neighbors[x][y] + " ");
         }
         else if(mouseButton == RIGHT) {
-          print("Flagged: " + x + ", " + y + " ");
           flag(x, y);
         }
       }
@@ -220,12 +245,68 @@ void hoverHex() {
   }
 }
 
-void flag(int x, int y) {
-  if(flagged[x][y]) {
-    flagged[x][y] = false;  
+void clearField(int x, int y) {
+  try {
+    checkUp(x, y);
+  }
+  catch (Exception e) {}
+  
+  try {
+    checkDown(x, y);
+  }
+  catch (Exception e) {}
+}
+
+void checkUp(int x, int y) {
+  int j = x;
+  int k = y - 1;
+  if(neighbors[j][k] == 0) {
+    try {
+      checkUp(j, k);
+      covered[j][k] = false;      
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
   }
   else {
-    flagged[x][y] = true;  
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void checkDown(int x, int y) {
+  int j = x;
+  int k = y + 1;
+  if(neighbors[j][k] == 0) {
+    try {
+      checkDown(j, k);
+      covered[j][k] = false;      
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+  }
+  else {
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void flag(int x, int y) {
+  if(covered[x][y]) {
+    if(flagged[x][y]) {
+      flagged[x][y] = false;  
+      print("Unflagged: " + x + ", " + y + " ");
+    }
+    else {
+      flagged[x][y] = true;  
+      print("Flagged: " + x + ", " + y + " ");
+    }
   }
 }
 
