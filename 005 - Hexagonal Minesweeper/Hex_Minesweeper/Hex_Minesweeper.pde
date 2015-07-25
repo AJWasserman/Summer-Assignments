@@ -7,6 +7,7 @@ boolean[][] flagged = new boolean[boardWidth][boardHeight];
 int[][] neighbors = new int[boardWidth][boardHeight];
 boolean[][] placed = new boolean[boardWidth][boardHeight];
 boolean[][] hover = new boolean[boardWidth][boardHeight];
+boolean[][] unN = new boolean[boardWidth][boardHeight];
 
 //Hexagon Variables
 float s; // = 700/(2*boardWidth); //Side length
@@ -17,16 +18,22 @@ int border;
 
 boolean inGame = true;
 
+
 void setup() {
   size(700, 700);
   frame.setTitle("Hexagonal Minesweeper");
   for(int x = 0; x < boardWidth; x++) { 
     for(int y = 0; y < boardHeight; y++) {
       placed[x][y] = false;
+      unN[x][y] = true;
     }
   }
   placeBombs(); 
-  neighborBombs();
+  for(int x = 0; x < boardWidth; x++) { 
+    for(int y = 0; y < boardHeight; y++) {
+      neighborBombs(x, y);
+    }
+  }
 }
 
 void draw() {
@@ -88,36 +95,62 @@ void placeBombs() {
   print("Place Count: " + placeCount + " ");
 }
 
-void neighborBombs() {
+void neighborBombs(int x, int y) {
   int bc = bombCount;
   int bw = boardWidth;
   int bh = boardHeight;
-  for (int x = 0; x < bw; x++) {
-    for (int y = 0; y < bh; y++) {
+  try {
+    if ((x%2) == 0 && hasBomb[x][y] && unN[x][y]) {
       try {
-        if ((x%2) == 0 && hasBomb[x][y]) {
-          neighbors[x][y-1] += 1; 
-          neighbors[x][y+1] += 1; 
-          neighbors[x+1][y-1] += 1; 
-          neighbors[x+1][y] += 1; 
-          neighbors[x-1][y-1] += 1; 
-          neighbors[x-1][y] += 1;    
-        }
-        //Checks bordering hexagons for odd columns
-        else if ((x%2) != 0 && hasBomb[x][y]) {
-          neighbors[x][y-1] += 1; 
-          neighbors[x][y+1] += 1; 
-          neighbors[x-1][y] += 1; 
-          neighbors[x+1][y] += 1; 
-          neighbors[x-1][y+1] += 1; 
-          neighbors[x+1][y+1] += 1; 
-        }
-        else {}
-      }
-      catch (Exception e) {}
+        neighbors[x][y-1]++; 
+      } catch (Exception e) {}
+      try {      
+        neighbors[x][y+1]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x+1][y-1]++; 
+      } catch (Exception e) {}      
+      
+      try { 
+        neighbors[x+1][y]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x-1][y-1]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x-1][y]++; 
+      } catch (Exception e) {}
+      
+      unN[x][y] = false;
     }
+    //Checks bordering hexagons for odd columns
+    if ((x%2) != 0 && hasBomb[x][y] && unN[x][y]) {
+      try {
+        neighbors[x][y-1]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x][y+1]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x-1][y]++;
+      } catch (Exception e) {} 
+      try {
+        neighbors[x+1][y]++; 
+      } catch (Exception e) {}
+      try {
+        neighbors[x-1][y+1]++; 
+      } catch (Exception e) {}
+      try {      
+        neighbors[x+1][y+1]++; 
+      } catch (Exception e) {}
+      
+      unN[x][y] = false;
+    }
+    else {}
   }
+  catch (Exception e) {}
 }
+
 
 void genVariables() {
   s = maxSize(); //Side length
