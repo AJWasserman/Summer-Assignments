@@ -281,11 +281,11 @@ void flag(int x, int y) {
   if(covered[x][y]) {
     if(flagged[x][y]) {
       flagged[x][y] = false;  
-      print("Unflagged: " + x + ", " + y + " ");
+      //print("Unflagged: " + x + ", " + y + " ");
     }
     else {
       flagged[x][y] = true;  
-      print("Flagged: " + x + ", " + y + " ");
+      //print("Flagged: " + x + ", " + y + " ");
     }
   }
 }

@@ -115,6 +115,11 @@ void checkUpperLeft(int x, int y) {
     }   
     try {
       checkUp(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    } 
+    try {
       checkLowerLeft(j, k);
     }
     catch (Exception e) {
