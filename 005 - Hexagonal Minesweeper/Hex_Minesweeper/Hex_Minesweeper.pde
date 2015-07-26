@@ -287,7 +287,19 @@ void checkUp(int x, int y) {
     } 
     catch (Exception e) {
       covered[j][k] = false;
+    }
+    try {
+      checkUpperLeft(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
     }   
+    try {
+      checkUpperRight(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    }  
   }
   else {
     try {
@@ -307,7 +319,14 @@ void checkDown(int x, int y) {
     }
     catch (Exception e) {
       covered[j][k] = false;
-    }     
+    }    
+    try {
+      checkLowerLeft(j, k);
+      checkLowerRight(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
   }
   else {
     try {
@@ -330,12 +349,21 @@ void checkUpperRight(int x, int y) {
   }
   if(neighbors[j][k] == 0) {
     try {
-      checkUpperRight(j, k);
-      covered[j][k] = false;      
+      checkUp(j, k);   
+      covered[j][k] = false;   
     } 
     catch (Exception e) {
       covered[j][k] = false;
-    }   
+    }
+    
+    try {
+      checkUpperRight(j, k);
+      checkLowerRight(j, k);
+      covered[j][k] = false;   
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }  
   }
   else {
     try {
@@ -364,6 +392,13 @@ void checkUpperLeft(int x, int y) {
     catch (Exception e) {
       covered[j][k] = false;
     }   
+    try {
+      checkUp(j, k);
+      checkLowerLeft(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    } 
   }
   else {
     try {
@@ -392,6 +427,16 @@ void checkLowerRight(int x, int y) {
     catch (Exception e) {
       covered[j][k] = false;
     }   
+    try {
+      checkUpperRight(j, k);
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+    try {
+      checkDown(j, k);   
+    }
+    catch (Exception e) {}
   }
   else {
     try {
@@ -419,7 +464,19 @@ void checkLowerLeft(int x, int y) {
     } 
     catch (Exception e) {
       covered[j][k] = false;
+    }  
+    try {
+      checkUpperLeft(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
     }   
+    try {
+      checkDown(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    }  
   }
   else {
     try {
