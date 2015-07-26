@@ -53,6 +53,8 @@ void draw() {
     rect(0, 0, width, 40);
     drawBoard();  
     frame.setSize((int)((boardWidth*1.55*s + (w / 2))), (int)(50 + 2 * border + offset + (sqrt(3)/2) * w * boardHeight));
+    
+    checkWin();
   }
 }
 
@@ -90,20 +92,21 @@ void drawBoard() {
 
 void placeBombs() {  
   int placeCount = bombCount;
+  randomSeed(second());
   for(int i = 0; i < placeCount; i++) {
     int randX = (int)random(boardWidth);
     int randY = (int)random(boardHeight);
     if(placed[randX][randY]) {
-      print("dupe ");
+      //print("dupe ");
       placeCount++;
     }
     else {
       hasBomb[randX][randY] = true;
       placed[randX][randY] = true;
     }
-    print("(" + randX + " " + randY + ") ");
+    //print("(" + randX + " " + randY + ") ");
   }
-  print("Place Count: " + placeCount + " ");
+  //print("Place Count: " + placeCount + " ");
 }
 
 void neighborBombs(int x, int y) {
@@ -193,32 +196,42 @@ void hexagon(float x, float y) {
 }
 
 void mousePressed() {
-  for(int x = 0; x < boardWidth; x ++) {
-    for(int y = 0; y < boardHeight; y++) {
-      if(hover[x][y]) {
-        if(mouseButton == LEFT) {
-          print("Clicked: " + x + ", " + y + " ");
-          if(covered[x][y]) {
-            if(!flagged[x][y]) {
-              if(neighbors[x][y] == 0 && !hasBomb[x][y]) {
-                clearField(x, y);  
-                covered[x][y] = false;
+  if(!gameOver) {
+    for(int x = 0; x < boardWidth; x ++) {
+      for(int y = 0; y < boardHeight; y++) {
+        if(hover[x][y]) {
+          if(mouseButton == LEFT) {
+            //print("Clicked: " + x + ", " + y + " ");
+            if(covered[x][y]) {
+              if(!flagged[x][y]) {
+                if(neighbors[x][y] == 0 && !hasBomb[x][y]) {
+                  clearField(x, y);  
+                  covered[x][y] = false;
+                }
+                else {
+                  covered[x][y] = false;  
+                }
               }
-              else {
-                covered[x][y] = false;  
+              if(hasBomb[x][y]) {
+                //print("Game over ");
+                gameOver();
               }
             }
-            if(hasBomb[x][y]) {
-              print("Game over ");
-              //gameOver();
-            }
+            //print("neighbors: " + neighbors[x][y] + " ");
           }
-          //print("neighbors: " + neighbors[x][y] + " ");
-        }
-        else if(mouseButton == RIGHT) {
-          flag(x, y);
+          else if(mouseButton == RIGHT) {
+            flag(x, y);
+          }
         }
       }
+    }
+  }
+}
+
+void keyReleased() {
+  if(gameOver) {
+    if(key == 'R' || key == 'r') {
+      reset();
     }
   }
 }
@@ -286,6 +299,39 @@ void flag(int x, int y) {
     else {
       flagged[x][y] = true;  
       //print("Flagged: " + x + ", " + y + " ");
+    }
+  }
+}
+
+void checkWin() {
+
+}
+
+void gameOver() {
+  gameOver = true;
+  for(int x = 0; x < boardWidth; x++) {
+    for(int y = 0; y < boardHeight; y++) {
+      covered[x][y] = false;
+      flagged[x][y] = false;
+    }
+  }
+}
+
+void reset() {
+  gameOver = false;
+  for(int x = 0; x < boardWidth; x++) { 
+    for(int y = 0; y < boardHeight; y++) {
+      neighbors[x][y] = 0;
+      hasBomb[x][y] = false;
+      placed[x][y] = false;
+      unN[x][y] = true;
+      covered[x][y] = true;
+    }
+  }
+  placeBombs(); 
+  for(int x = 0; x < boardWidth; x++) { 
+    for(int y = 0; y < boardHeight; y++) {
+      neighborBombs(x, y);
     }
   }
 }
