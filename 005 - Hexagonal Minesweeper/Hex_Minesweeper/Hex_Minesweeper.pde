@@ -85,6 +85,11 @@ void drawBoard() {
         fill(255, 255, 255);
       }
       hexagon(border + x*.75*w, 40 + border + offset + y*sqrt(3)/2*w);
+      if(!covered[x][y] && !hasBomb[x][y]) {
+        textSize(15);
+        fill(0, 0, 0);
+        text(neighbors[x][y], border - 5 + x*.75*w, 45 + border + offset + y*sqrt(3)/2*w);
+      }
       popMatrix();   
     }
   }
