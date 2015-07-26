@@ -43,6 +43,11 @@ void checkDown(int x, int y) {
     }    
     try {
       checkLowerLeft(j, k);
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+    try {
       checkLowerRight(j, k);
     }
     catch (Exception e) {
