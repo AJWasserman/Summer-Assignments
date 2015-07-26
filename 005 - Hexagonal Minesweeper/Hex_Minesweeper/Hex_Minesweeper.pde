@@ -11,6 +11,15 @@ boolean[][] placed = new boolean[boardWidth][boardHeight];
 boolean[][] hover = new boolean[boardWidth][boardHeight];
 boolean[][] unN = new boolean[boardWidth][boardHeight];
 
+boolean start = false;
+boolean options = false;
+boolean controls = false;
+boolean displayOptions = false;
+boolean displayControls = false;
+boolean inputWidth;
+boolean inputHeight;
+boolean inputBomb;
+
 //Hexagon Variables
 float s; // = 700/(2*boardWidth); //Side length
 float w; // = 2*s; //Width
@@ -18,11 +27,10 @@ float h; // = sqrt(3)/2*w; //Height
 float offset; 
 int border; 
 
-boolean menu = false;
-boolean inGame = true;
+boolean menu = true;
+boolean inGame = false;
 boolean gameOver = false;
 boolean won = false;
-
 
 void setup() {
   size(700, 700);
@@ -44,14 +52,20 @@ void setup() {
 
 void draw() {
   background(102);
+  if(menu) {
+    drawMenu();
+    checkStart();
+    checkOptions();
+    checkControls();
+  }
+    
   if(inGame) {
+
     frame.setResizable(true);
     genVariables(); 
     
     hoverHex();
     
-    fill(200, 200, 200);
-    rect(0, 0, width, 40);
     drawBoard();  
     frame.setSize((int)((boardWidth*1.55*s + (w / 2))), (int)(50 + 2 * border + offset + (sqrt(3)/2) * w * boardHeight));
     
@@ -59,56 +73,30 @@ void draw() {
   }
 }
 
-void drawBoard() {
-  for(int x = 0; x < boardWidth; x++) { 
-    for(int y = 0; y < boardHeight; y++) {
-      if((x%2) != 0) { 
-        offset = h/2; //Offsets row y position on odd rows
-      }
-      else {
-        offset = 0; //No offset on even rows
-      }
-        
-      pushMatrix();
-      if(flagged[x][y]) {
-        fill(255, 255, 0);  
-      }
-      else if(covered[x][y] == true) {
-        fill(0, 255, 0);  
-      }
-      else if(hasBomb[x][y] == true) {
-        fill(255, 0, 0);  
-      }
-      else if(neighbors[x][y] != 0) {
-        fill(0, 0, 255);  
-      }
-      else {
-        fill(255, 255, 255);
-      }
-      hexagon(border + x*.75*w, 40 + border + offset + y*sqrt(3)/2*w);
-      if(!covered[x][y] && !hasBomb[x][y]) {
-        textSize(15);
-        fill(0, 0, 0);
-        text(neighbors[x][y], border - 5 + x*.75*w, 45 + border + offset + y*sqrt(3)/2*w);
-      }
-      if(flagged[x][y]) {
-        textSize(15);
-        fill(0, 0, 0);
-        text("Flag", border - 15 + x*.75*w, 45 + border + offset + y*sqrt(3)/2*w);  
-      }
-      if(gameOver && won) {
-        textSize(48);
-        stroke(0, 0, 0);
-        fill(255, 0, 0);
-        text("You win!", width/2 - 95, 40 + height/2);  
-      }
-      if(gameOver && !won) {
-        textSize(48);
-        fill(0, 0, 0);
-        text("You lose!", width/2 - 105, 40 + height/2);  
-      }
-      popMatrix();   
-    }
+void checkStart() {
+  if(mouseX > (width/2 - 200) && mouseX < (width/2 + 200) && mouseY > 125 && mouseY < 225) {
+    start = true;  
+  }
+  else {
+    start = false;  
+  }
+}
+
+void checkOptions() {
+  if(mouseX > (width/2 - 200) && mouseX < (width/2 + 200) && mouseY > 250 && mouseY < 350) {
+    options = true;  
+  }
+  else {
+    options = false;  
+  }
+}
+
+void checkControls() {
+  if(mouseX > (width/2 - 200) && mouseX < (width/2 + 200) && mouseY > 375 && mouseY < 475) {
+    controls = true;  
+  }
+  else {
+    controls = false;
   }
 }
 
@@ -219,6 +207,18 @@ void hexagon(float x, float y) {
 
 void mousePressed() {
   if(!gameOver) {
+    if(start) {
+      menu = false;
+      inGame = true;  
+    }
+    if(options) {
+      displayControls = false;
+      displayOptions = true;  
+    }
+    if(controls) {
+      displayOptions = false;
+      displayControls = true;  
+    }
     for(int x = 0; x < boardWidth; x ++) {
       for(int y = 0; y < boardHeight; y++) {
         if(hover[x][y]) {
@@ -251,6 +251,23 @@ void mousePressed() {
 }
 
 void keyReleased() {
+  if(options) {
+    if(key == 'W' || key == 'w') {
+      inputWidth = true;
+      inputHeight = false;
+      inputBomb = false;
+    }  
+    else if(key == 'H' || key == 'h') {
+      inputHeight = true;
+      inputWidth = false;
+      inputBomb = false;
+    }
+    else if(key == 'B' || key == 'b') {
+      inputBomb = true;
+      inputHeight = false;
+      inputWidth = false;
+    }
+  }
   if(gameOver) {
     if(key == 'R' || key == 'r') {
       reset();
@@ -331,17 +348,26 @@ void flag(int x, int y) {
 
 void checkWin() {
   int correctFlag = 0;
+  int uncovered = 0;
   for(int x = 0; x < boardWidth; x++) {
     for(int y = 0; y < boardHeight; y++) {
       if(hasBomb[x][y] && flagged[x][y]) {
         correctFlag++;
       }  
+      if(!covered[x][y]) {
+        uncovered++;  
+      }
     }
   }
   
   if(correctFlag == bombCount) {
     gameOver = true;
     won = true;
+  }
+  
+  if(uncovered == (boardWidth * boardHeight) - bombCount) {
+    gameOver = true;
+    won = true;      
   }
 }
 
@@ -364,6 +390,7 @@ void reset() {
       placed[x][y] = false;
       unN[x][y] = true;
       covered[x][y] = true;
+      flagged[x][y] = false;
     }
   }
   placeBombs(); 
@@ -373,3 +400,5 @@ void reset() {
     }
   }
 }
+
+
