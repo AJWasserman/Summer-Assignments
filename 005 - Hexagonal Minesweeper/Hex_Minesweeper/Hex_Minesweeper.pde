@@ -255,12 +255,32 @@ void clearField(int x, int y) {
     checkDown(x, y);
   }
   catch (Exception e) {}
+  
+  try {
+    checkUpperRight(x, y);
+  }
+  catch (Exception e) {}
+  
+  try {
+    checkUpperLeft(x, y);
+  }
+  catch (Exception e) {}
+  
+  try {
+    checkLowerRight(x, y);  
+  }
+  catch (Exception e) {}
+  
+  try {
+    checkLowerLeft(x, y);
+  }
+  catch (Exception e) {}
 }
 
 void checkUp(int x, int y) {
   int j = x;
   int k = y - 1;
-  if(neighbors[j][k] == 0) {
+  if(neighbors[j][k] == 0 && covered[j][k]) {
     try {
       checkUp(j, k);
       covered[j][k] = false;      
@@ -283,6 +303,118 @@ void checkDown(int x, int y) {
   if(neighbors[j][k] == 0) {
     try {
       checkDown(j, k);
+      covered[j][k] = false;
+    }
+    catch (Exception e) {
+      covered[j][k] = false;
+    }     
+  }
+  else {
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void checkUpperRight(int x, int y) {
+  int j;
+  int k;
+  if((x%2) == 0) {
+    j = x + 1;
+    k = y - 1;
+  }
+  else {
+    j = x + 1;
+    k = y;
+  }
+  if(neighbors[j][k] == 0) {
+    try {
+      checkUpperRight(j, k);
+      covered[j][k] = false;      
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+  }
+  else {
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void checkUpperLeft(int x, int y) {
+  int j;
+  int k;
+  if((x%2) == 0) {
+    j = x - 1;
+    k = y - 1;
+  }
+  else {
+    j = x - 1;
+    k = y;
+  }
+  if(neighbors[j][k] == 0) {
+    try {
+      checkUpperLeft(j, k);
+      covered[j][k] = false;      
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+  }
+  else {
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void checkLowerRight(int x, int y) {
+  int j;
+  int k;
+  if((x%2) == 0) {
+    j = x + 1;
+    k = y;
+  }
+  else {
+    j = x + 1;
+    k = y + 1;
+  }
+  if(neighbors[j][k] == 0) {
+    try {
+      checkLowerRight(j, k);
+      covered[j][k] = false;      
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }   
+  }
+  else {
+    try {
+      covered[j][k] = false;  
+    }
+    catch (Exception e) {}
+  } 
+}
+
+void checkLowerLeft(int x, int y) {
+  int j;
+  int k;
+  if((x%2) == 0) {
+    j = x - 1;
+    k = y;
+  }
+  else {
+    j = x - 1;
+    k = y + 1;
+  }
+  if(neighbors[j][k] == 0) {
+    try {
+      checkLowerLeft(j, k);
       covered[j][k] = false;      
     } 
     catch (Exception e) {
