@@ -84,6 +84,12 @@ void checkUpperRight(int x, int y) {
     
     try {
       checkUpperRight(j, k);
+      covered[j][k] = false;   
+    } 
+    catch (Exception e) {
+      covered[j][k] = false;
+    }  
+    try {
       checkLowerRight(j, k);
       covered[j][k] = false;   
     } 
