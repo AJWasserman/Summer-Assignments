@@ -1,7 +1,7 @@
 int boardWidth = 9;
 int boardHeight = 9;
 int bombCount = 10;
-int flagCount = bombCount;
+int flagCount = 0;
 
 boolean[][] hasBomb = new boolean[boardWidth][boardHeight];
 boolean[][] flagged = new boolean[boardWidth][boardHeight];
@@ -21,6 +21,7 @@ int border;
 boolean menu = false;
 boolean inGame = true;
 boolean gameOver = false;
+boolean won = false;
 
 
 void setup() {
@@ -89,6 +90,22 @@ void drawBoard() {
         textSize(15);
         fill(0, 0, 0);
         text(neighbors[x][y], border - 5 + x*.75*w, 45 + border + offset + y*sqrt(3)/2*w);
+      }
+      if(flagged[x][y]) {
+        textSize(15);
+        fill(0, 0, 0);
+        text("Flag", border - 15 + x*.75*w, 45 + border + offset + y*sqrt(3)/2*w);  
+      }
+      if(gameOver && won) {
+        textSize(48);
+        stroke(0, 0, 0);
+        fill(255, 0, 0);
+        text("You win!", width/2 - 95, 40 + height/2);  
+      }
+      if(gameOver && !won) {
+        textSize(48);
+        fill(0, 0, 0);
+        text("You lose!", width/2 - 105, 40 + height/2);  
       }
       popMatrix();   
     }
@@ -299,17 +316,33 @@ void flag(int x, int y) {
   if(covered[x][y]) {
     if(flagged[x][y]) {
       flagged[x][y] = false;  
+      flagCount--;
       //print("Unflagged: " + x + ", " + y + " ");
     }
     else {
-      flagged[x][y] = true;  
+      if(flagCount < bombCount) {
+        flagged[x][y] = true;  
+        flagCount++;
+      }
       //print("Flagged: " + x + ", " + y + " ");
     }
   }
 }
 
 void checkWin() {
-
+  int correctFlag = 0;
+  for(int x = 0; x < boardWidth; x++) {
+    for(int y = 0; y < boardHeight; y++) {
+      if(hasBomb[x][y] && flagged[x][y]) {
+        correctFlag++;
+      }  
+    }
+  }
+  
+  if(correctFlag == bombCount) {
+    gameOver = true;
+    won = true;
+  }
 }
 
 void gameOver() {
