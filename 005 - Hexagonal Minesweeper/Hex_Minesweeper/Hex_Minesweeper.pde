@@ -391,6 +391,7 @@ void gameOver() {
 void reset() {
   gameOver = false;
   won = false;
+  flagCount = 0;
   for(int x = 0; x < boardWidth; x++) { 
     for(int y = 0; y < boardHeight; y++) {
       neighbors[x][y] = 0;
