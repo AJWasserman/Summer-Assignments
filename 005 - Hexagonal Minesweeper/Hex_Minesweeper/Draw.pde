@@ -22,6 +22,7 @@ void drawMenu() {
     textSize(48);
     textAlign(CENTER, CENTER);
     text("Options", width/2, 300);
+
     
     fill(200, 200, 200);
     rectMode(CENTER);
@@ -32,8 +33,20 @@ void drawMenu() {
     text("Controls", width/2, 425);
     
     if(displayOptions) {
+      
       fill(200, 200, 200);
       rect(width/2, 595, 600, 175);
+      
+      fill(220, 220, 220);
+      rect(width/2, 555, 500, 70);
+      
+      fill(220, 220, 220);
+      rect(width/2, 635, 500, 70);
+      
+      textSize(48);
+      fill(100, 0, 0);
+      text("Easy", width/2, 550);
+      text("Normal", width/2, 630);
     }
     if(displayControls) {
       fill(200, 200, 200);
@@ -44,6 +57,7 @@ void drawMenu() {
       text("Right Click: Flag/Unflag", width/2, 590);
       text("R: Reset (When won/lost)", width/2, 630);
     }
+
 }
 
 void drawBoard() {
@@ -83,7 +97,7 @@ void drawBoard() {
       if(flagged[x][y]) {
         textSize(15);
         fill(0, 0, 0);
-        text("Flag", border + x*.75*w, 40 + border + offset + y*sqrt(3)/2*w);  
+        text("F", border + x*.75*w, 40 + border + offset + y*sqrt(3)/2*w);  
       }
       if(gameOver) {
         rectMode(CENTER);

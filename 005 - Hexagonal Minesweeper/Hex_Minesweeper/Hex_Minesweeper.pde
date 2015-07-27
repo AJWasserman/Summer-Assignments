@@ -1,9 +1,9 @@
 /*
 <-- CUSTOMIZE BOARD SIZE AND BOMB COUNT HERE -->
 */
-int boardWidth = 9;
-int boardHeight = 9;
-int bombCount = 10;
+int boardWidth = 16;
+int boardHeight = 16;
+int bombCount = 40;
 int flagCount = 0;
 /*
 <-- END CUSTOMIZATION -->
@@ -22,8 +22,10 @@ boolean[][] unN = new boolean[boardWidth][boardHeight];
 boolean start = false;
 boolean options = false;
 boolean controls = false;
+boolean easy = false;
 boolean displayOptions = false;
 boolean displayControls = false;
+
 
 //Hexagon Variables
 float s; //Side length
@@ -41,18 +43,16 @@ boolean won = false;
 void setup() {
   size(700, 700);
   frame.setTitle("Hexagonal Minesweeper");
-  
-    placeBombs(); //Generate bomb positions
-  
-  //Generate starting states for some of the 2D arrays
-  for(int x = 0; x < boardWidth; x++) { 
-    for(int y = 0; y < boardHeight; y++) {
-      placed[x][y] = false;
-      unN[x][y] = true;
-      covered[x][y] = true;
-      neighborBombs(x, y);
-    }
-  }
+      placeBombs(); //Generate bomb positions  
+      //Generate starting states for some of the 2D arrays
+      for(int x = 0; x < boardWidth; x++) { 
+        for(int y = 0; y < boardHeight; y++) {
+          placed[x][y] = false;
+          unN[x][y] = true;
+          covered[x][y] = true;
+          neighborBombs(x, y);
+        }
+      }  
 }
 
 void draw() {
@@ -61,6 +61,7 @@ void draw() {
     drawMenu();
     checkStart();
     checkOptions();
+    checkEasy();
     checkControls();
   }
     
@@ -95,6 +96,16 @@ void checkOptions() {
   }
   else {
     options = false;  
+  }
+}
+
+//Checks if cursor is above easy button
+void checkEasy() {
+  if(mouseX > (width/2 - 250) && mouseX < (width/2 + 250) && mouseY > 520 && mouseY < 590) {
+    easy = true;  
+  }
+  else {
+    easy = false;  
   }
 }
 
@@ -232,6 +243,9 @@ void mousePressed() {
     if(controls) {
       displayOptions = false;
       displayControls = true;  
+    }
+    if(easy) {
+      changeLevel();
     }
     for(int x = 0; x < boardWidth; x ++) {
       for(int y = 0; y < boardHeight; y++) {
@@ -386,6 +400,34 @@ void gameOver() {
     }
   }
 }
+
+void changeLevel() {
+  if(easy) {
+    boardHeight = 9;
+    boardWidth = 9;
+    bombCount = 10;
+    gameOver = false;
+    won = false;
+    flagCount = 0;
+    for(int x = 0; x < boardWidth; x++) { 
+      for(int y = 0; y < boardHeight; y++) {
+        neighbors[x][y] = 0;
+        hasBomb[x][y] = false;
+        placed[x][y] = false;
+        unN[x][y] = true;
+        covered[x][y] = true;
+        flagged[x][y] = false;
+      }
+    }
+    placeBombs(); 
+    for(int x = 0; x < boardWidth; x++) { 
+      for(int y = 0; y < boardHeight; y++) {
+        neighborBombs(x, y); //Finds new neighboring hexagons
+      }
+    }
+  }
+}
+
 
 //Sets all booleans and arrays back to their initial states and re-places bombs
 void reset() {
